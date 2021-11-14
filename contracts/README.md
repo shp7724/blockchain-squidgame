@@ -6,3 +6,6 @@
 - [ ] `getAddressWithFastestRecord()`: `_records` 변수에서 가장 빠른 기록을 가진 참여자의 지갑 주소를 반환한다.
 - [ ] `finishGame()`: `winner`에게 상금을 전부 지급하고, `_totalFund`와 `_fund`, `_records` 변수를 초기화한다.
 
+# Update
+
+- [ ] 참여자가 판돈을 거는 로직
