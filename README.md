@@ -31,7 +31,8 @@ python3 -m http.server
 1. 먼저 자신이 작업할 브랜치를 생성합니다.
 
 ```bash
-git branch -d <your_branch_name>  # <your_branch_name>이라는 이름의 브랜치를 만들고, 해당 브랜치로 이동
+git branch <your_branch_name>  # <your_branch_name>이라는 이름의 브랜치를 만들고,
+git checkout <your_branch_name>  # 해당 브랜치로 이동
 ```
 
 2. 코드 작업을 하고, 변경사항을 커밋합니다.
