@@ -27,7 +27,7 @@ const text = document.querySelector('.text')
 let DEAD_PLAYERS = 0
 let SAFE_PLAYERS = 0
 
-const startBtn = document.querySelector('.start-btn')
+const startBtn = document.querySelector('#start-btn')
 
 //musics
 const bgMusic = new Audio('./music/bg.mp3')
@@ -40,7 +40,7 @@ loader.load( './model/scene.gltf', function ( gltf ){
     doll = gltf.scene
     gltf.scene.position.set(0,-1, 0)
     gltf.scene.scale.set(0.4, 0.4, 0.4)
-    startBtn.innerText = "start"
+    startBtn.innerText = "베팅 및 게임 시작"
 })
 
 function lookBackward(){
@@ -197,10 +197,8 @@ async function startDall(){
 
 
 startBtn.addEventListener('click', () => {
-    if(startBtn.innerText == "START"){
-        init()
-        document.querySelector('.modal').style.display = "none"
-    }
+    init()
+    document.querySelector('.modal').style.display = "none"
 })
 
 function animate(){
