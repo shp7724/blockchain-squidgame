@@ -34,7 +34,7 @@ contract ERC20 {
         코드 수정해보겠습니다.!!!!          
         ㄹㄹ
         minhong
-        minhong123123
+        minhong123123123123123
 
         */
     }
