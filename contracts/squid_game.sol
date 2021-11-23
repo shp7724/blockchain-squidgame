@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.0;
 
-contract ERC20 {
+contract SquidGame {
     mapping (address => uint256) private _balances;  // 참여자별 SQD 토큰의 보유량을 관리하는 변수
     mapping (address => uint256) private _records;  // 참여자별 완주 기록을 관리하는 변수
-    mapping (address => bool) private _isFirsts;  // 참여자별 첫 방문 여부를 관리하는 변수
+    mapping (address => bool) private _isRegistered;  // 참여자별 첫 방문 여부를 관리하는 변수
 
     mapping (address => mapping (address => uint256)) private _allowances;  // 무시해도 되는 변수
 
@@ -16,17 +16,14 @@ contract ERC20 {
     uint256 private _totalSupply = 2100000000;  // 전체 SQD 토큰의 발행량을 관리하는 변수
     uint256 private _totalFund = 0;  // 전체 모금액을 관리하는 변수
 
-    string private _name;
-    string private _symbol;
+    string private _symbol = "SQD";
     
     address private _owner;  // owner of this contract
 
     uint256 private _previousBestScore = 0;
     address private _previousBestScorer;
 
-    constructor (string memory name_, string memory symbol_) {
-        _name = name_;
-        _symbol = symbol_;
+    constructor () {
         _balances[msg.sender] = _totalSupply;
         _owner = msg.sender;
         emit Transfer(address(0), msg.sender, _totalSupply);
@@ -35,12 +32,12 @@ contract ERC20 {
     // 구현 완료, 테스트 미완료
     function playerEnters(address player) public virtual {
         /*
-        오징어게임에 처음으로 방문한 유저라면 100 SQD를 무료로 지급한다. (`_isFirsts` 사용)
+        오징어게임에 처음으로 방문한 유저라면 100 SQD를 무료로 지급한다. (`_isRegistered` 사용)
         */
-        if (_isFirsts[player]) {
+        if (!_isRegistered[player]) {
             _balances[_owner] -= 100;
             _balances[player] += 100;
-            _isFirsts[player] = false;
+            _isRegistered[player] = true;
         } else {
             // (일단은) 첫 참가자가 아니면 한푼도 주지 않는다.
         }
@@ -75,8 +72,8 @@ contract ERC20 {
     }
 
     // 구현 완료, 테스트 미완료
-    function isUserFirstTime(address player) public virtual returns (bool) {
-        return _isFirsts[player];
+    function isUserRegistered(address player) public view virtual returns (bool) {
+        return _isRegistered[player];
     }
 
     // 구현 완료, 테스트 미완료
@@ -95,10 +92,6 @@ contract ERC20 {
     https://github.com/boohyunsik/myERC20/blob/master/myERC20.sol 에서 복붙했습니다.
     
     */
-
-    function name() public view virtual returns (string memory) {
-        return _name;
-    }
 
     function symbol() public view virtual returns (string memory) {
         return _symbol;
