@@ -23,9 +23,17 @@ const start_position = 6
 const end_position = -start_position
 
 const text = document.querySelector('.text')
+// const timer = document.querySelector('.text')
 
 let DEAD_PLAYERS = 0
 let SAFE_PLAYERS = 0
+
+// 타이머 흐르는 여부
+var running = 0;
+// 타이머 id
+var timer = 0;
+// 0.001초 단위
+var time = 0;
 
 const startBtn = document.querySelector('#start-btn')
 
@@ -88,7 +96,8 @@ class Player {
 
     run(){
         if(this.playerInfo.isDead) return
-        this.playerInfo.velocity = .03
+        // 플레이어 속도 조절
+        this.playerInfo.velocity = .01
     }
 
     stop(){
@@ -125,6 +134,10 @@ class Player {
                 gameStat = "ended"
             }
         }
+        // 어떤 방식으로든 게임이 종료되면 타이머가 멈춘다.
+        if (gameStat == "ended") {
+            running = 0;
+        }
     }
 
     update(){
@@ -138,8 +151,8 @@ async function delay(ms){
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+// player2 삭제
 const player1 = new Player("Player 1", .25, .3, 0xD1FFC6)
-const player2 = new Player("Player 2", .25, -.3, 0xFFCFD2)
 
 const players = [
     {
@@ -147,14 +160,11 @@ const players = [
         key: "ArrowUp",
         name: "Player 1"
     },
-    {
-        player: player2,
-        key: "w",
-        name: "Player 2"
-    }
+    // player2 삭제
 ]
 
-const TIME_LIMIT = 15
+// 시간 제한 3분으로 늘리기
+const TIME_LIMIT = 180
 async function init(){
     await delay(500)
     text.innerText = "Starting in 3"
@@ -163,9 +173,13 @@ async function init(){
     await delay(500)
     text.innerText = "Starting in 1"
     lookBackward()
+
     await delay(500)
-    text.innerText = "Gooo!!!"
-    bgMusic.play()
+    // 초 세기 시작
+    running = 1;
+    increment()
+    // 배경음악 시끄러워서 끔
+    // bgMusic.play()
     start()
 }
 
@@ -178,6 +192,7 @@ function start(){
     gsap.to(progressBar.scale, {duration: TIME_LIMIT, x: 0, ease: "none"})
     setTimeout(() => {
         if(gameStat != "ended"){
+            running = 0
             text.innerText = "Time Out!!!"
             loseMusic.play()
             gameStat = "ended"
@@ -186,8 +201,34 @@ function start(){
     startDall()
 }
 
+function increment() {
+    if (running == 1) {
+        timer = setTimeout(function () {
+            time++;
+            var mins = Math.floor(time / 1000 / 60);
+            var secs = Math.floor(time / 1000 % 60);
+            var milSecs = time % 1000;
+            if (mins < 10) {
+                mins = "0" + mins;
+            }
+            if (secs < 10) {
+                secs = "0" + secs;
+            }
+            if (milSecs < 10) {
+                milSecs = "00" + milSecs;
+            } else if (milSecs < 100) {
+                milSecs = "0" + milSecs;
+            }
+
+            text.innerText = "<b>"+mins + ":" + secs + ":" + milSecs+"</b>";
+            increment();
+        }, 1)
+    }
+}
+
 let dallFacingBack = true
 async function startDall(){
+    // 돌아보기 랜덤화 코드
    lookBackward()
    await delay((Math.random() * 1500) + 1500)
    lookForward()
