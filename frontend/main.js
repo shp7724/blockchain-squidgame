@@ -205,24 +205,24 @@ function increment() {
     if (running == 1) {
         timer = setTimeout(function () {
             time++;
-            var mins = Math.floor(time / 1000 / 60);
-            var secs = Math.floor(time / 1000 % 60);
-            var milSecs = time % 1000;
+            var mins = Math.floor(time / 100 / 60);
+            var secs = Math.floor(time / 100 % 60);
+            var milSecs = time % 100;
             if (mins < 10) {
                 mins = "0" + mins;
             }
             if (secs < 10) {
                 secs = "0" + secs;
             }
+            // if (milSecs < 10) {
+            //     milSecs = "00" + milSecs;
             if (milSecs < 10) {
-                milSecs = "00" + milSecs;
-            } else if (milSecs < 100) {
                 milSecs = "0" + milSecs;
             }
 
-            text.innerText = "<b>"+mins + ":" + secs + ":" + milSecs+"</b>";
+            text.innerText = mins + ":" + secs + ":" + milSecs;
             increment();
-        }, 1)
+        }, 10)
     }
 }
 
