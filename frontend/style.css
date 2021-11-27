@@ -16,6 +16,15 @@ body {
   font-size: 50px;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
+.timer {
+  position: fixed;
+  top: 30px;
+  font-weight: bold;
+  right: 10%;
+  transform: translateX(-50%);
+  font-size: 40px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
 
 .modal {
   position: fixed;

@@ -23,7 +23,7 @@ const start_position = 6
 const end_position = -start_position
 
 const text = document.querySelector('.text')
-// const timer = document.querySelector('.text')
+const timer = document.querySelector('.timer')
 
 let DEAD_PLAYERS = 0
 let SAFE_PLAYERS = 0
@@ -31,7 +31,7 @@ let SAFE_PLAYERS = 0
 // 타이머 흐르는 여부
 var running = 0;
 // 타이머 id
-var timer = 0;
+var timerId = 0;
 // 0.001초 단위
 var time = 0;
 
@@ -113,7 +113,7 @@ class Player {
             DEAD_PLAYERS++
             loseMusic.play()
             if(DEAD_PLAYERS == players.length){
-                text.innerText = "Everyone lost!!!"
+                text.innerText = "You lost!!!"
                 gameStat = "ended"
             }
             if(DEAD_PLAYERS + SAFE_PLAYERS == players.length){
@@ -127,7 +127,7 @@ class Player {
             SAFE_PLAYERS++
             winMusic.play()
             if(SAFE_PLAYERS == players.length){
-                text.innerText = "Everyone is safe!!!"
+                text.innerText = "You are safe!!!"
                 gameStat = "ended"
             }
             if(DEAD_PLAYERS + SAFE_PLAYERS == players.length){
@@ -173,7 +173,7 @@ async function init(){
     await delay(500)
     text.innerText = "Starting in 1"
     lookBackward()
-
+    text.innerText = ""
     await delay(500)
     // 초 세기 시작
     running = 1;
@@ -203,7 +203,7 @@ function start(){
 
 function increment() {
     if (running == 1) {
-        timer = setTimeout(function () {
+        timerId = setTimeout(function () {
             time++;
             var mins = Math.floor(time / 100 / 60);
             var secs = Math.floor(time / 100 % 60);
@@ -220,7 +220,7 @@ function increment() {
                 milSecs = "0" + milSecs;
             }
 
-            text.innerText = mins + ":" + secs + ":" + milSecs;
+            timer.innerText = mins + ":" + secs + ":" + milSecs;
             increment();
         }, 10)
     }
@@ -228,7 +228,7 @@ function increment() {
 
 let dallFacingBack = true
 async function startDall(){
-    // 돌아보기 랜덤화 코드
+    // 돌아보기 랜덤화 코드(이미 짜여져 있음)
    lookBackward()
    await delay((Math.random() * 1500) + 1500)
    lookForward()
