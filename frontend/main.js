@@ -51,13 +51,14 @@ loader.load( './model/scene.gltf', function ( gltf ){
     startBtn.innerText = "베팅 및 게임 시작"
 })
 
-function lookBackward(){
-    gsap.to(doll.rotation, {duration: .45, y: -3.15})
-    setTimeout(() => dallFacingBack = true, 150)
+// 회전 속도 랜덤 및 판정 수정
+function lookBackward(rotateDuration){
+    gsap.to(doll.rotation, {duration: rotateDuration, y: -3.15})
+    setTimeout(() => dallFacingBack = true, rotateDuration * 1000)
 }
-function lookForward(){
-    gsap.to(doll.rotation, {duration: .45, y: 0})
-    setTimeout(() => dallFacingBack = false, 450)
+function lookForward(rotateDuration){
+    gsap.to(doll.rotation, {duration: rotateDuration, y: 0})
+    setTimeout(() => dallFacingBack = false, rotateDuration * 1000)
 }
 
 function createCube(size, posX, rotY = 0, color = 0xfbc851){
@@ -172,7 +173,7 @@ async function init(){
     text.innerText = "Starting in 2"
     await delay(500)
     text.innerText = "Starting in 1"
-    lookBackward()
+    lookBackward(.45)
     text.innerText = ""
     await delay(500)
     // 초 세기 시작
@@ -228,10 +229,12 @@ function increment() {
 
 let dallFacingBack = true
 async function startDall(){
-    // 돌아보기 랜덤화 코드(이미 짜여져 있음)
-   lookBackward()
+    // 돌아보기 사이의 시간 텀은 랜덤으로 되어있음
+    // 돌아보는데 걸리는 시간도 랜덤화 한다.
+    var rotateDuration = .25
+   lookBackward(rotateDuration + Math.random() * .90)
    await delay((Math.random() * 1500) + 1500)
-   lookForward()
+   lookForward(rotateDuration + Math.random() * .90)
    await delay((Math.random() * 750) + 750)
    startDall()
 }
