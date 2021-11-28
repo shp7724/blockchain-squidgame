@@ -4,19 +4,27 @@ pragma solidity ^0.8.0;
 
 contract SquidGame {
     mapping(address => uint256) private _balances; // 참여자별 SQD 토큰의 보유량을 관리하는 변수
-    mapping(address => uint256) private _records; // 참여자별 완주 기록을 관리하는 변수
     mapping(address => bool) private _isRegistered; // 참여자별 첫 방문 여부를 관리하는 변수
 
     mapping(address => mapping(address => uint256)) private _allowances; // 무시해도 되는 변수
 
     // 아래와 같은 이벤트를 `emit`하면 웹브라우저에게 어떠한 이벤트가 발생했는지 알려줄 수 있습니다.
     event Transfer(address indexed from, address indexed to, uint256 value);
+
     event Approval(
         address indexed owner,
         address indexed spender,
         uint256 value
     );
-    event PlayerEntered(address indexed player, bool isFirst);
+
+    event PlayerEntered(
+        address indexed player,
+        uint256 betAmount,
+        uint256 balance,
+        uint256 accumulatedFund
+    );
+
+    event PlayerCompleted(bool isTopScorer, uint256 bestScore);
 
     uint256 private _totalSupply = 2100000000; // 전체 SQD 토큰의 발행량을 관리하는 변수
     uint256 private _totalFund = 0; // 전체 모금액을 관리하는 변수
@@ -25,7 +33,7 @@ contract SquidGame {
 
     address private _owner; // owner of this contract
 
-    uint256 private _previousBestScore = 0;
+    uint256 private _previousBestScore = type(uint256).max;
     address private _previousBestScorer;
 
     constructor() {
@@ -48,18 +56,21 @@ contract SquidGame {
             // (일단은) 첫 참가자가 아니면 한푼도 주지 않는다.
             collectFund(player, betAmount);
         }
+        emit PlayerEntered(player, betAmount, balanceOf(player), _totalFund);
     }
 
     // 구현 완료, 테스트 미완료
     function playerCompletes(address player, uint256 record) public virtual {
         /*
         참여자가 게임을 완주하면 그 기록을 저장한다.
-        이전 기록보다 이 참여자의 기록이 높으면 업데이트한다.
+        이전 기록보다 이 참여자의 기록이 낮으면 (더 빠르면) 업데이트한다.
         */
-        _records[player] = record;
-        if (_previousBestScore < record) {
+        if (_previousBestScore > record) {
             _previousBestScore = record;
             _previousBestScorer = player;
+            emit PlayerCompleted(true, _previousBestScore);
+        } else {
+            emit PlayerCompleted(false, _previousBestScore);
         }
     }
 
@@ -78,9 +89,12 @@ contract SquidGame {
 
     function finishGame() public virtual {
         /*
-        TODO: `winner`에게 상금을 전부 지급하고, `_totalFund`와 `_fund`, `_records` 변수를 초기화한다.
+        `winner`에게 상금을 전부 지급하고, `_totalFund`를 초기화한다.
         */
         address winner = getAddressWithFastestRecord();
+        _balances[winner] += _totalFund;
+        _totalFund = 0;
+        _previousBestScorer = address(0);
     }
 
     // 구현 완료, 테스트 미완료
@@ -91,6 +105,10 @@ contract SquidGame {
         returns (bool, uint256)
     {
         return (_isRegistered[player], _balances[player]);
+    }
+
+    function totalFund() public view virtual returns (uint256) {
+        return _totalFund;
     }
 
     // 구현 완료, 테스트 미완료
