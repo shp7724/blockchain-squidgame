@@ -17,6 +17,9 @@ contract SquidGame {
         uint256 value
     );
     event PlayerEntered(address indexed player, bool isFirst);
+    
+    // + 11/28
+    event WithdrawalSQD(address _addr, uint256 _amount, bool bOk);
 
     uint256 private _totalSupply = 2100000000; // 전체 SQD 토큰의 발행량을 관리하는 변수
     uint256 private _totalFund = 0; // 전체 모금액을 관리하는 변수
@@ -32,6 +35,10 @@ contract SquidGame {
         _balances[msg.sender] = _totalSupply;
         _owner = msg.sender;
         emit Transfer(address(0), msg.sender, _totalSupply);
+        
+        // + 11/28
+        totalRaisedTokenTillNow = 0;
+        totalWithdrawlTokenTillNow = 0;
     }
 
     // 구현 완료, 테스트 미완료
@@ -75,13 +82,43 @@ contract SquidGame {
         */
         return _previousBestScorer;
     }
+    
+    
+    
+    // + 11/28
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+    }
 
+    modifier onlyWinner() {
+        require(msg.sender == winner);
+    }
+    
+    function withdrawlByWinner() public onlyWinner {
+
+        //require()   <-에러 날 경우 조건 추가해주기
+        Token.transfer(msg.sender, winner, totalRaisedTokenTillNow);
+        totalRaisedTokenTillNow = 0;
+
+    }
+       
+
+    /*
     function finishGame() public virtual {
         /*
         TODO: `winner`에게 상금을 전부 지급하고, `_totalFund`와 `_fund`, `_records` 변수를 초기화한다.
         */
         address winner = getAddressWithFastestRecord();
     }
+    */
+
+
+
+
+
+
+
+
 
     // 구현 완료, 테스트 미완료
     function isUserRegistered(address player)
