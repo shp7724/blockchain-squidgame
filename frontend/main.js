@@ -23,9 +23,21 @@ const start_position = 6
 const end_position = -start_position
 
 const text = document.querySelector('.text')
+const timer = document.querySelector('.timer')
+const box = document.querySelector('.message_content')
 
 let DEAD_PLAYERS = 0
 let SAFE_PLAYERS = 0
+
+// 타이머 흐르는 여부
+var running = 0;
+// 타이머 id
+var timerId = 0;
+// 0.001초 단위
+var time = 0;
+
+// 무궁화 박스 가로 길이
+let width = box.offsetWidth;
 
 const startBtn = document.querySelector('#start-btn')
 
@@ -43,13 +55,14 @@ loader.load( './model/scene.gltf', function ( gltf ){
     startBtn.innerText = "베팅 및 게임 시작"
 })
 
-function lookBackward(){
-    gsap.to(doll.rotation, {duration: .45, y: -3.15})
+// 회전 속도 랜덤 및 판정 수정
+function lookBackward(rotateDuration){
+    gsap.to(doll.rotation, {duration: rotateDuration, y: -3.15})
     setTimeout(() => dallFacingBack = true, 150)
 }
-function lookForward(){
-    gsap.to(doll.rotation, {duration: .45, y: 0})
-    setTimeout(() => dallFacingBack = false, 450)
+function lookForward(rotateDuration){
+    gsap.to(doll.rotation, {duration: rotateDuration, y: 0})
+    setTimeout(() => dallFacingBack = false, rotateDuration * 1000)
 }
 
 function createCube(size, posX, rotY = 0, color = 0xfbc851){
@@ -88,7 +101,8 @@ class Player {
 
     run(){
         if(this.playerInfo.isDead) return
-        this.playerInfo.velocity = .03
+        // 플레이어 속도 조절
+        this.playerInfo.velocity = .01
     }
 
     stop(){
@@ -104,7 +118,7 @@ class Player {
             DEAD_PLAYERS++
             loseMusic.play()
             if(DEAD_PLAYERS == players.length){
-                text.innerText = "Everyone lost!!!"
+                text.innerText = "You lost!!!"
                 gameStat = "ended"
             }
             if(DEAD_PLAYERS + SAFE_PLAYERS == players.length){
@@ -118,12 +132,16 @@ class Player {
             SAFE_PLAYERS++
             winMusic.play()
             if(SAFE_PLAYERS == players.length){
-                text.innerText = "Everyone is safe!!!"
+                text.innerText = "You are safe!!!"
                 gameStat = "ended"
             }
             if(DEAD_PLAYERS + SAFE_PLAYERS == players.length){
                 gameStat = "ended"
             }
+        }
+        // 어떤 방식으로든 게임이 종료되면 타이머가 멈춘다.
+        if (gameStat == "ended") {
+            running = 0;
         }
     }
 
@@ -138,8 +156,8 @@ async function delay(ms){
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+// player2 삭제
 const player1 = new Player("Player 1", .25, .3, 0xD1FFC6)
-const player2 = new Player("Player 2", .25, -.3, 0xFFCFD2)
 
 const players = [
     {
@@ -147,14 +165,11 @@ const players = [
         key: "ArrowUp",
         name: "Player 1"
     },
-    {
-        player: player2,
-        key: "w",
-        name: "Player 2"
-    }
+    // player2 삭제
 ]
 
-const TIME_LIMIT = 15
+// 시간 제한 3분으로 늘리기
+const TIME_LIMIT = 180
 async function init(){
     await delay(500)
     text.innerText = "Starting in 3"
@@ -162,10 +177,15 @@ async function init(){
     text.innerText = "Starting in 2"
     await delay(500)
     text.innerText = "Starting in 1"
-    lookBackward()
+    lookBackward(.45)
+    text.innerText = ""
+    // text.style.width = '40%';
     await delay(500)
-    text.innerText = "Gooo!!!"
-    bgMusic.play()
+    // 초 세기 시작
+    running = 1;
+    increment()
+    // 배경음악 시끄러워서 끔
+    // bgMusic.play()
     start()
 }
 
@@ -178,6 +198,7 @@ function start(){
     gsap.to(progressBar.scale, {duration: TIME_LIMIT, x: 0, ease: "none"})
     setTimeout(() => {
         if(gameStat != "ended"){
+            running = 0
             text.innerText = "Time Out!!!"
             loseMusic.play()
             gameStat = "ended"
@@ -186,13 +207,89 @@ function start(){
     startDall()
 }
 
+function increment() {
+    if (running == 1) {
+        timerId = setTimeout(function () {
+            time++;
+            var mins = Math.floor(time / 100 / 60);
+            var secs = Math.floor(time / 100 % 60);
+            var milSecs = time % 100;
+            if (mins < 10) {
+                mins = "0" + mins;
+            }
+            if (secs < 10) {
+                secs = "0" + secs;
+            }
+            // if (milSecs < 10) {
+            //     milSecs = "00" + milSecs;
+            if (milSecs < 10) {
+                milSecs = "0" + milSecs;
+            }
+
+            timer.innerText = mins + ":" + secs + ":" + milSecs;
+            increment();
+        }, 10)
+    }
+}
+
 let dallFacingBack = true
+var defaultRotateDuration = 1
+var firstRotate = 1
+var secondRotate = 1
+var backwardDelay = 1
+var forwardDelay = 1
+var totalDelay = 1
+
+var maxDelay = 3000 + 60
+var curDelay = 0
+
 async function startDall(){
-   lookBackward()
-   await delay((Math.random() * 1500) + 1500)
-   lookForward()
-   await delay((Math.random() * 750) + 750)
+    // 돌아보기 사이의 시간 텀은 랜덤으로 되어있음
+    // 돌아보는데 걸리는 시간도 랜덤화 한다.
+    defaultRotateDuration = .10
+    firstRotate = multipleBy10((defaultRotateDuration + Math.random() * .50) * 1000)
+    secondRotate = multipleBy10((defaultRotateDuration + Math.random() * .50) * 1000)
+    backwardDelay = multipleBy10((Math.random() * 1500) + 1500)
+    forwardDelay = multipleBy10((Math.random() * 750) + 750)
+    totalDelay = firstRotate + secondRotate + backwardDelay + forwardDelay
+
+   lookBackward(firstRotate / 1000)
+    updateMessageBackward()
+   await delay(backwardDelay)
+
+    let depth = secondRotate / 10
+    let timePerDepth = (maxDelay - curDelay) / depth
+    updateMessageRotating(timePerDepth)
+    lookForward(secondRotate / 1000)
+
+   await delay(forwardDelay)
+    curDelay = 0
+    box.style.width = "0px"
    startDall()
+}
+
+function multipleBy10(number) {
+    return number - number % 10
+}
+
+function updateMessageBackward() {
+    if (curDelay < backwardDelay && gameStat != "ended") {
+        setTimeout(function () {
+            curDelay = curDelay + 10;
+            box.style.width = width * (curDelay / maxDelay) + "px";
+            updateMessageBackward();
+        }, 10)
+    }
+}
+
+function updateMessageRotating(timePerDepth) {
+    if (curDelay < maxDelay && gameStat != "ended") {
+        setTimeout(function () {
+            curDelay = curDelay + timePerDepth;
+            box.style.width = width * (curDelay / maxDelay) + "px";
+            updateMessageRotating(timePerDepth);
+        }, 10)
+    }
 }
 
 
