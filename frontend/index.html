@@ -559,11 +559,16 @@
                         const bestRecord = completeEvent["bestScore"];
                         $("#main-title").text("");
                         if (isBest) {
-                            alert("축하합니다! 현재 1위입니다.");
+                            alert(
+                                "축하합니다! 현재 1위입니다.\n" +
+                                    "현재 최고 기록: " +
+                                    bestRecord / 100000 +
+                                    "초"
+                            );
                         } else {
                             alert(
                                 "아쉽지만 1위를 차지하지 못했습니다. 현재 최고 기록: " +
-                                    bestRecord / 1000 +
+                                    bestRecord / 100000 +
                                     "초"
                             );
                         }

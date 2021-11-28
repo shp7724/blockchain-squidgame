@@ -102,7 +102,7 @@ class Player {
     run(){
         if(this.playerInfo.isDead) return
         // 플레이어 속도 조절
-        this.playerInfo.velocity = .03
+        this.playerInfo.velocity = .015
     }
 
     stop(){
