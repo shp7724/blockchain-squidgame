@@ -157,7 +157,7 @@ async function delay(ms){
 }
 
 // player2 삭제
-const player1 = new Player("Player 1", .25, .3, 0xD1FFC6)
+const player1 = new Player("Player 1", .25, 0, 0xD1FFC6)
 
 const players = [
     {
@@ -172,11 +172,11 @@ const players = [
 const TIME_LIMIT = 180
 async function init(){
     await delay(500)
-    text.innerText = "Starting in 3"
+    text.innerText = "3초.."
     await delay(500)
-    text.innerText = "Starting in 2"
+    text.innerText = "2초.."
     await delay(500)
-    text.innerText = "Starting in 1"
+    text.innerText = "1초.."
     lookBackward(.45)
     text.innerText = ""
     // text.style.width = '40%';
@@ -199,7 +199,7 @@ function start(){
     setTimeout(() => {
         if(gameStat != "ended"){
             running = 0
-            text.innerText = "Time Out!!!"
+            text.innerText = "시간 종료!"
             loseMusic.play()
             gameStat = "ended"
         }
