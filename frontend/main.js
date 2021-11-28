@@ -24,6 +24,7 @@ const end_position = -start_position
 
 const text = document.querySelector('.text')
 const timer = document.querySelector('.timer')
+const box = document.querySelector('.message_content')
 
 let DEAD_PLAYERS = 0
 let SAFE_PLAYERS = 0
@@ -34,6 +35,9 @@ var running = 0;
 var timerId = 0;
 // 0.001초 단위
 var time = 0;
+
+// 무궁화 박스 가로 길이
+let width = box.offsetWidth;
 
 const startBtn = document.querySelector('#start-btn')
 
@@ -54,11 +58,13 @@ loader.load( './model/scene.gltf', function ( gltf ){
 // 회전 속도 랜덤 및 판정 수정
 function lookBackward(rotateDuration){
     gsap.to(doll.rotation, {duration: rotateDuration, y: -3.15})
-    setTimeout(() => dallFacingBack = true, rotateDuration * 1000)
+    setTimeout(() => dallFacingBack = true, 150)
+    box.style.width = width * 0.3 + "px"
 }
 function lookForward(rotateDuration){
     gsap.to(doll.rotation, {duration: rotateDuration, y: 0})
     setTimeout(() => dallFacingBack = false, rotateDuration * 1000)
+    box.style.width = width + "px"
 }
 
 function createCube(size, posX, rotY = 0, color = 0xfbc851){
@@ -175,6 +181,7 @@ async function init(){
     text.innerText = "Starting in 1"
     lookBackward(.45)
     text.innerText = ""
+    // text.style.width = '40%';
     await delay(500)
     // 초 세기 시작
     running = 1;
@@ -228,15 +235,64 @@ function increment() {
 }
 
 let dallFacingBack = true
+var defaultRotateDuration = 1
+var firstRotate = 1
+var secondRotate = 1
+var backwardDelay = 1
+var forwardDelay = 1
+var totalDelay = 1
+
+var maxDelay = 3000 + 60
+var curDelay = 0
+
 async function startDall(){
     // 돌아보기 사이의 시간 텀은 랜덤으로 되어있음
     // 돌아보는데 걸리는 시간도 랜덤화 한다.
-    var rotateDuration = .25
-   lookBackward(rotateDuration + Math.random() * .90)
-   await delay((Math.random() * 1500) + 1500)
-   lookForward(rotateDuration + Math.random() * .90)
-   await delay((Math.random() * 750) + 750)
+    defaultRotateDuration = .10
+    firstRotate = multipleBy10((defaultRotateDuration + Math.random() * .50) * 1000)
+    console.log(firstRotate);
+    secondRotate = multipleBy10((defaultRotateDuration + Math.random() * .50) * 1000)
+    backwardDelay = multipleBy10((Math.random() * 1500) + 1500)
+    forwardDelay = multipleBy10((Math.random() * 750) + 750)
+    totalDelay = firstRotate + secondRotate + backwardDelay + forwardDelay
+
+   lookBackward(firstRotate / 1000)
+    updateMessageBackward()
+   await delay(backwardDelay)
+
+    let depth = secondRotate / 10
+    let timePerDepth = (maxDelay - curDelay) / depth
+    updateMessageRotating(timePerDepth)
+    lookForward(secondRotate / 1000)
+
+   await delay(forwardDelay)
+    curDelay = 0
+    box.style.width = "0px"
    startDall()
+}
+
+function multipleBy10(number) {
+    return number - number % 10
+}
+
+function updateMessageBackward() {
+    if (curDelay < backwardDelay && gameStat != "ended") {
+        setTimeout(function () {
+            curDelay = curDelay + 10;
+            box.style.width = width * (curDelay / maxDelay) + "px";
+            updateMessageBackward();
+        }, 10)
+    }
+}
+
+function updateMessageRotating(timePerDepth) {
+    if (curDelay < maxDelay && gameStat != "ended") {
+        setTimeout(function () {
+            curDelay = curDelay + timePerDepth;
+            box.style.width = width * (curDelay / maxDelay) + "px";
+            updateMessageRotating(timePerDepth);
+        }, 10)
+    }
 }
 
 

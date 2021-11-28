@@ -26,6 +26,20 @@ body {
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
+.message_content {
+  position: fixed;
+  top: 30px;
+  left: 10%;
+  background: #e5c62d;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  display: inline;
+}
+
 .modal {
   position: fixed;
   top: 0;
