@@ -59,12 +59,10 @@ loader.load( './model/scene.gltf', function ( gltf ){
 function lookBackward(rotateDuration){
     gsap.to(doll.rotation, {duration: rotateDuration, y: -3.15})
     setTimeout(() => dallFacingBack = true, 150)
-    box.style.width = width * 0.3 + "px"
 }
 function lookForward(rotateDuration){
     gsap.to(doll.rotation, {duration: rotateDuration, y: 0})
     setTimeout(() => dallFacingBack = false, rotateDuration * 1000)
-    box.style.width = width + "px"
 }
 
 function createCube(size, posX, rotY = 0, color = 0xfbc851){
@@ -250,7 +248,6 @@ async function startDall(){
     // 돌아보는데 걸리는 시간도 랜덤화 한다.
     defaultRotateDuration = .10
     firstRotate = multipleBy10((defaultRotateDuration + Math.random() * .50) * 1000)
-    console.log(firstRotate);
     secondRotate = multipleBy10((defaultRotateDuration + Math.random() * .50) * 1000)
     backwardDelay = multipleBy10((Math.random() * 1500) + 1500)
     forwardDelay = multipleBy10((Math.random() * 750) + 750)
