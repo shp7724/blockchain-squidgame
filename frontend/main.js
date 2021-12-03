@@ -14,7 +14,7 @@ scene.add( directionalLight )
 directionalLight.position.set( 0, 1, 1 )
 
 camera.position.z = 5
-renderer.setClearColor( 0xB7C3F3, 1 )
+renderer.setClearColor( 0xedd08b, 1)
 
 const loader = new THREE.GLTFLoader()
 let doll
@@ -22,7 +22,7 @@ let doll
 const start_position = 6
 const end_position = -start_position
 
-const text = document.querySelector('.text')
+const text = document.querySelector('#main-title')
 const timer = document.querySelector('.timer')
 const box = document.querySelector('.message_content')
 
@@ -50,18 +50,18 @@ const loseMusic = new Audio('./music/lose.mp3')
 loader.load( './model/scene.gltf', function ( gltf ){
     scene.add( gltf.scene )
     doll = gltf.scene
-    gltf.scene.position.set(0,-1, 0)
+    gltf.scene.position.set(-5,-1, 0)
     gltf.scene.scale.set(0.4, 0.4, 0.4)
     startBtn.innerText = "베팅 및 게임 시작"
 })
 
 // 회전 속도 랜덤 및 판정 수정
 function lookBackward(rotateDuration){
-    gsap.to(doll.rotation, {duration: rotateDuration, y: -3.15})
+    gsap.to(doll.rotation, {duration: rotateDuration, y: -1.575})
     setTimeout(() => dallFacingBack = true, 150)
 }
 function lookForward(rotateDuration){
-    gsap.to(doll.rotation, {duration: rotateDuration, y: 0})
+    gsap.to(doll.rotation, {duration: rotateDuration, y: 1.575})
     setTimeout(() => dallFacingBack = false, rotateDuration * 1000)
 }
 
@@ -76,9 +76,9 @@ function createCube(size, posX, rotY = 0, color = 0xfbc851){
 }
 
 //Creating runway
-createCube({w: start_position * 2 + .21, h: 1.5, d: 1}, 0, 0, 0xe5a716).position.z = -1
-createCube({w: .2, h: 1.5, d: 1}, start_position, -.4)
-createCube({w: .2, h: 1.5, d: 1}, end_position, .4)
+// createCube({w: start_position * 2 + .21, h: 1.5, d: 1}, 0, 0, 0xe5a716).position.z = -1
+// createCube({w: .2, h: 1.5, d: 1}, start_position, -.4)
+// createCube({w: .2, h: 1.5, d: 1}, end_position, .4)
 
 
 class Player {
@@ -102,7 +102,7 @@ class Player {
     run(){
         if(this.playerInfo.isDead) return
         // 플레이어 속도 조절
-        this.playerInfo.velocity = .01
+        this.playerInfo.velocity = .015
     }
 
     stop(){
@@ -118,7 +118,7 @@ class Player {
             DEAD_PLAYERS++
             loseMusic.play()
             if(DEAD_PLAYERS == players.length){
-                text.innerText = "You lost!!!"
+                text.innerText = "456번, 탈락."
                 gameStat = "ended"
             }
             if(DEAD_PLAYERS + SAFE_PLAYERS == players.length){
@@ -126,14 +126,15 @@ class Player {
             }
         }
         if(this.playerInfo.positionX < end_position + .7){
-            text.innerText = this.playerInfo.name + " is safe!!!"
+            text.innerText = this.playerInfo.name + "456번, 성공."
             this.playerInfo.isDead = true
             this.stop()
             SAFE_PLAYERS++
             winMusic.play()
             if(SAFE_PLAYERS == players.length){
-                text.innerText = "You are safe!!!"
+                text.innerText = "456번, 성공."
                 gameStat = "ended"
+                playerCompletes(time * 1000)
             }
             if(DEAD_PLAYERS + SAFE_PLAYERS == players.length){
                 gameStat = "ended"
@@ -157,12 +158,12 @@ async function delay(ms){
 }
 
 // player2 삭제
-const player1 = new Player("Player 1", .25, .3, 0xD1FFC6)
+const player1 = new Player("Player 1", .25, -2, 0x006e64)
 
 const players = [
     {
         player: player1,
-        key: "ArrowUp",
+        key: "ArrowLeft",
         name: "Player 1"
     },
     // player2 삭제
@@ -171,14 +172,6 @@ const players = [
 // 시간 제한 3분으로 늘리기
 const TIME_LIMIT = 180
 async function init(){
-    await delay(500)
-    text.innerText = "Starting in 3"
-    await delay(500)
-    text.innerText = "Starting in 2"
-    await delay(500)
-    text.innerText = "Starting in 1"
-    lookBackward(.45)
-    text.innerText = ""
     // text.style.width = '40%';
     await delay(500)
     // 초 세기 시작
@@ -193,13 +186,13 @@ let gameStat = "loading"
 
 function start(){
     gameStat = "started"
-    const progressBar = createCube({w: 8, h: .1, d: 1}, 0, 0, 0xebaa12)
-    progressBar.position.y = 3.35
-    gsap.to(progressBar.scale, {duration: TIME_LIMIT, x: 0, ease: "none"})
+    // const progressBar = createCube({w: 8, h: .1, d: 1}, 0, 0, 0xebaa12)
+    // progressBar.position.y = 3.35
+    // gsap.to(progressBar.scale, {duration: TIME_LIMIT, x: 0, ease: "none"})
     setTimeout(() => {
         if(gameStat != "ended"){
             running = 0
-            text.innerText = "Time Out!!!"
+            text.innerText = "시간 초과!"
             loseMusic.play()
             gameStat = "ended"
         }
@@ -293,10 +286,6 @@ function updateMessageRotating(timePerDepth) {
 }
 
 
-startBtn.addEventListener('click', () => {
-    init()
-    document.querySelector('.modal').style.display = "none"
-})
 
 function animate(){
     renderer.render( scene, camera )
