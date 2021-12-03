@@ -14,7 +14,7 @@ scene.add( directionalLight )
 directionalLight.position.set( 0, 1, 1 )
 
 camera.position.z = 5
-renderer.setClearColor( 0xB7C3F3, 1 )
+renderer.setClearColor( 0xedd08b, 1)
 
 const loader = new THREE.GLTFLoader()
 let doll
