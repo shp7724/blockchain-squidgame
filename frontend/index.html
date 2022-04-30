@@ -472,7 +472,7 @@
                 },
             ];
             const contractAddress =
-                "0x5caa38849eF106b9F235f3549e18f6a69392F029";
+                "0x4FCeAe8C65A076143a4fc9B723665CB45262d721";
 
             const contract = new web3.eth.Contract(
                 contractAbi,
@@ -492,7 +492,7 @@
                             } else {
                                 $("#first-msg").addClass("d-none");
                             }
-                            $("#current-sqd").text(data[1]);
+                            $("#current-sqd").text(data[1] - 2100000000 + 100);
                             $("#input-group").removeClass("d-none");
                         });
             };
